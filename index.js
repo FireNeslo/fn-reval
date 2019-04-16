@@ -10,6 +10,7 @@ function emit(listeners, value) {
   for(const listener of listeners) {
     listener(value)
   }
+  return value
 }
 function map(callback) {
   const target = value()
