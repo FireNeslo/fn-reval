@@ -59,7 +59,12 @@ function changed(current, callback) {
   return target
 }
 
-export const api = { map, scan, flatMap, startWith, filter, changed }
+function pipe(output) {
+  this(output)
+  return output
+}
+
+export const api = { map, scan, flatMap, startWith, filter, changed, pipe }
 
 export function value(current, listeners=[]) {
   function watch(value) {
@@ -71,6 +76,21 @@ export function value(current, listeners=[]) {
     return on(listeners, value, current)
   }
   return Object.assign(watch, api)
+}
+
+export function duplex(read, write) {
+  const target = value()
+
+  read(target)
+
+  function duplexer(value) {
+    if(typeof value === 'function') {
+      return read(value)
+    } else {
+      return write(value)
+    }
+  }
+  return Object.assign(duplexer, target)
 }
 
 export function merge(sources, current = Array.isArray(sources) ? [] : {}) {
